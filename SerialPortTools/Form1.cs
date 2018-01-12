@@ -89,6 +89,32 @@ namespace SerialPortTools
             return true;
         }
 
+        private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            //延时 100ms等待接收完成数据
+            System.Threading.Thread.Sleep(100);
+            //this.Invoke 就是跨现成访问ui的方法
+            this.Invoke((EventHandler)(delegate {
+                if (IsHEX == false)
+                {
+                    TbxRecvData.Text += sp.ReadLine();
+                }
+                else
+                {
+                    Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
+                    sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
+                    string RecvDataText = null;
+                    for (int i = 0; i < ReceivedData.Length; i++)
+                    {
+                        RecvDataText += ("0x" + ReceivedData[i].ToString("X2") + "");
+                    }
+                    TbxRecvData.Text += RecvDataText;
+                }
+                sp.DiscardInBuffer(); //丢弃接收缓冲区数据
+
+            }));
+        }
+
         private void SetPortProperty() //设置串口属性
         {
             sp = new SerialPort();
@@ -120,7 +146,9 @@ namespace SerialPortTools
                 sp.StopBits = StopBits.One;
             }
 
-            sp.DataBits = Convert.ToInt16(CbxBaudBate.Text.Trim());
+            sp.DataBits = Convert.ToInt32(CbxBaudBate.Text.Trim());
+
+    
 
             string s = CbxParity.Text.Trim();//设置奇偶校验
 
@@ -145,8 +173,108 @@ namespace SerialPortTools
 
             sp.RtsEnable = true;
 
+            sp.DataReceived += new SerialDataReceivedEventHandler(sp_DataReceived);
+
+            if (RbnHex.Checked)
+            {
+                IsHEX = true;
+            }
+            else
+            {
+                IsHEX = false;
+            }
 
         }
+
+        private void BtnSend_Click(object sender, EventArgs e)
+        {
+            if (IsOped)//写串口数据
+            {
+                try
+                {
+                    sp.WriteLine(TbxSendData.Text);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("发送数据时发生错误！", "错误提示");
+                    return;
+                }
+            }
+            else
+            {
+                MessageBox.Show("串口未打开","错误提示");
+                return;
+            }
+        }
+
+        private void BtnOpenCOM_Click(object sender, EventArgs e)
+        {
+            if (IsOped == false)
+            {
+                if (!CheckPortSetting())//检测串口设置
+                {
+                    MessageBox.Show("串口未设置！", "错误提示");
+                    return;
+                }
+                if (!IsSetProperty)//串口为设置则设置串口
+                {
+                    SetPortProperty();
+                    IsSetProperty = true;
+                }
+
+                try//打开串口
+                {
+                    sp.Open();
+                    IsOped = true;
+                    BtnOpenCOM.Text = "关闭串口";
+                    //串口打开后则相关的串口设置按钮便不可再用
+                    CbxCOMPort.Enabled = false;
+                    CbxBaudBate.Enabled = false;
+                    CbxDataBits.Enabled = false;
+                    CbxParity.Enabled = false;
+                    CbxStopBits.Enabled = false;
+                    RbnChar.Enabled = false;
+                    RbnHex.Enabled = false;
+                }
+                catch (Exception)
+                {
+                    //打开串口失败后，响应标志为取消
+                    IsSetProperty = false;
+                    IsOped = false;
+                    MessageBox.Show("串口无效或已被占用", "错误提示");
+                }
+            }
+            else
+            {
+                try//关闭串口
+                {
+                    sp.Close();
+                    IsOped = false;
+                    BtnOpenCOM.Text = "打开串口";
+                    //串口打开后则相关的串口设置按钮便不可再用
+                    CbxCOMPort.Enabled = true;
+                    CbxBaudBate.Enabled = true;
+                    CbxDataBits.Enabled = true;
+                    CbxParity.Enabled = true;
+                    CbxStopBits.Enabled = true;
+                    RbnChar.Enabled = true;
+                    RbnHex.Enabled = true;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("串口无法关闭", "错误提示");
+                }
+            }
+
+        }
+
+        private void BtnCleanData_Click(object sender, EventArgs e)
+        {
+            TbxRecvData.Text = "";
+            TbxSendData.Text = "";
+        }
+
+
     }
 
 

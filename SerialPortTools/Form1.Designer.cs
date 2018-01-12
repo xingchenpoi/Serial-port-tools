@@ -53,7 +53,6 @@
             this.RevDATABox.SuspendLayout();
             this.SendDataBox.SuspendLayout();
             this.SuspendLayout();
-            
             // 
             // SettingsBox
             // 
@@ -108,6 +107,7 @@
             this.BtnOpenCOM.TabIndex = 11;
             this.BtnOpenCOM.Text = "打开串口";
             this.BtnOpenCOM.UseVisualStyleBackColor = true;
+            this.BtnOpenCOM.Click += new System.EventHandler(this.BtnOpenCOM_Click);
             // 
             // BtnCheckCOM
             // 
@@ -131,6 +131,7 @@
             this.CbxDataBits.Name = "CbxDataBits";
             this.CbxDataBits.Size = new System.Drawing.Size(121, 20);
             this.CbxDataBits.TabIndex = 9;
+
             // 
             // CbxParity
             // 
@@ -282,6 +283,7 @@
             // 
             // TbxRecvData
             // 
+            this.TbxRecvData.BackColor = System.Drawing.SystemColors.HighlightText;
             this.TbxRecvData.Location = new System.Drawing.Point(9, 21);
             this.TbxRecvData.Multiline = true;
             this.TbxRecvData.Name = "TbxRecvData";
@@ -309,6 +311,7 @@
             this.BtnSend.TabIndex = 2;
             this.BtnSend.Text = "发送数据";
             this.BtnSend.UseVisualStyleBackColor = true;
+            this.BtnSend.Click += new System.EventHandler(this.BtnSend_Click);
             // 
             // BtnCleanData
             // 
@@ -318,6 +321,7 @@
             this.BtnCleanData.TabIndex = 1;
             this.BtnCleanData.Text = "清空数据";
             this.BtnCleanData.UseVisualStyleBackColor = true;
+            this.BtnCleanData.Click += new System.EventHandler(this.BtnCleanData_Click);
             // 
             // TbxSendData
             // 
