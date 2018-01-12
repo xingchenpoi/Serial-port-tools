@@ -1,0 +1,9 @@
+d:\training\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.exe
+d:\training\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.pdb
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csprojResolveAssemblyReference.cache
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.Form1.resources
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.Properties.Resources.resources
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csproj.GenerateResource.Cache
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csproj.CoreCompileInputs.cache
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.exe
+d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.pdb
