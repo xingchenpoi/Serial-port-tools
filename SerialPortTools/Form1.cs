@@ -36,37 +36,35 @@ namespace SerialPortTools
             CbxStopBits.SelectedIndex = 1;
             CbxDataBits.SelectedIndex = 0;
             CbxParity.SelectedIndex = 0;
-           
-        }
 
-        private void BtnCheckCOM_Click(object sender, EventArgs e)
-        {
+
             bool COMExistence = false; //有可用的串口标志
             CbxCOMPort.Items.Clear();  //清除当前串口号中的说有串口名称
-            for (int i = 0; i < 40; i++)
+            //优化串口检测按钮，使其不输出错误的调试信息
+            try
             {
-                try
+                foreach (string s in SerialPort.GetPortNames())
                 {
-                    SerialPort sp = new SerialPort("COM" + (i + 1).ToString());
-                    sp.Open();
-                    sp.Close();
-                    CbxCOMPort.Items.Add("COM" + (i + 1).ToString());
-                    COMExistence = true;
+                    CbxCOMPort.Items.Add(s);
                 }
-                catch (Exception)
-                {
-                    continue;
-                }
-                if (COMExistence)
-                {
-                    CbxCOMPort.SelectedIndex = 0;//使显示LISTBOX显示第1个添加的索引
-                }
-                else
-                {
-                    MessageBox.Show("我没有找到可使用串口！","错误提示");
-                }
+                COMExistence = true;
+
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("串口打开失败");
+            }
+
+            if (COMExistence)
+            {
+                CbxCOMPort.SelectedIndex = 0;//使显示LISTBOX显示第1个添加的索引
+            }
+            else
+            {
+                MessageBox.Show("我没有找到可使用串口！", "错误提示");
             }
         }
+
 
         private bool CheckPortSetting()//检查串口是否设置
         {
@@ -90,39 +88,16 @@ namespace SerialPortTools
             return true;
         }
 
-        private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            //延时 100ms等待接收完成数据
-            System.Threading.Thread.Sleep(100);
-            //this.Invoke 就是跨现成访问ui的方法
-            this.Invoke((EventHandler)(delegate {
-                if (IsHEX == false)
-                {
-                    TbxRecvData.Text += sp.ReadLine();
-                }
-                else
-                {
-                    Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
-                    sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
-                    string RecvDataText = null;
-                    for (int i = 0; i < ReceivedData.Length; i++)
-                    {
-                        RecvDataText += ("0x" + ReceivedData[i].ToString("X2") + "");
-                    }
-                    TbxRecvData.Text += RecvDataText;
-                }
-                sp.DiscardInBuffer(); //丢弃接收缓冲区数据
 
-            }));
-        }
 
         private void SetPortProperty() //设置串口属性
         {
-            sp = new SerialPort();
+            sp = new SerialPort
+            {
+                PortName = CbxCOMPort.Text.Trim(),
 
-            sp.PortName = CbxCOMPort.Text.Trim();
-
-            sp.BaudRate = Convert.ToInt32(CbxBaudBate.Text.Trim());
+                BaudRate = Convert.ToInt32(CbxBaudBate.Text.Trim())
+            };
 
             float f = Convert.ToSingle(CbxStopBits.Text.Trim());
 
@@ -146,14 +121,12 @@ namespace SerialPortTools
             {
                 sp.StopBits = StopBits.One;
             }
-
-
            
             try
             {
                 int temp = Convert.ToInt16(CbxDataBits.Text.Trim());
                 sp.DataBits = temp;
-                //System.Diagnostics.Debug.WriteLine("数据位设置正确");
+                System.Diagnostics.Debug.WriteLine("数据位设置正确");
             }
             catch
             {
@@ -161,8 +134,6 @@ namespace SerialPortTools
             }
            
            
-    
-
             string s = CbxParity.Text.Trim();//设置奇偶校验
 
             if (s.CompareTo("无") == 0)
@@ -186,7 +157,14 @@ namespace SerialPortTools
 
             sp.RtsEnable = true;
 
-            sp.DataReceived += new SerialDataReceivedEventHandler(sp_DataReceived);
+            try
+            {               
+                sp.DataReceived += new SerialDataReceivedEventHandler(Sp_DataReceived);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("接收进程错误","错误提示");
+            }
 
             if (RbnHex.Checked)
             {
@@ -199,27 +177,84 @@ namespace SerialPortTools
 
         }
 
+        //接收进程
+        private void Sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+                if (IsHEX == false)
+                {
+                    try
+                    {
+                        TbxRecvData.Text += sp.ReadLine();
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("ASCII接收错误","错误提示");
+                    }                   
+                }
+                else
+                {
+                    try
+                    {
+                        Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
+                        sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
+                        string RecvDataText = null;
+                        for (int i = 0; i < ReceivedData.Length; i++)
+                        {
+                            RecvDataText +=( ReceivedData[i].ToString("X2") + "");
+                        }
+                        TbxRecvData.Text += RecvDataText;
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("16进制数接收错误", "错误提示");
+                        TbxRecvData.Text = "";
+                    }
+                }
+                sp.DiscardInBuffer(); //丢弃接收缓冲区数据
+                System.Diagnostics.Debug.WriteLine("接收数据");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("接收线程错误","错误提示");
+            }
+        }
+
+        //发送数据按钮
         private void BtnSend_Click(object sender, EventArgs e)
         {
             if (IsOped)//写串口数据
             {
                 try
                 {
-                    sp.WriteLine(TbxSendData.Text);
+                    if (IsHEX == false)
+                    {
+                        sp.WriteLine(TbxSendData.Text);
+                    }
+                    else
+                    {
+                        Byte[] SendData = new Byte[TbxSendData.Text.Length];
+                        string s = TbxSendData.Text;
+                        for (int i = 0; i < TbxSendData.Text.Length; i++)
+                        {
+                            SendData[i] = Convert.ToByte(s[i]);
+                        }
+                        sp.Write(SendData,0,TbxSendData.Text.Length);
+                    }
                 }
                 catch (Exception)
                 {
                     MessageBox.Show("发送数据时发生错误！", "错误提示");
-                    return;
                 }
             }
             else
             {
                 MessageBox.Show("串口未打开","错误提示");
-                return;
             }
         }
 
+        //打开串口按钮
         private void BtnOpenCOM_Click(object sender, EventArgs e)
         {
             if (IsOped == false)

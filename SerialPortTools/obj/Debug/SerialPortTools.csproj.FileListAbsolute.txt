@@ -8,11 +8,11 @@ d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csproj.Cor
 d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.exe
 d:\training\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.pdb
 E:\visual studio 2017\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.exe
-E:\visual studio 2017\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.pdb
-E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csprojResolveAssemblyReference.cache
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.Form1.resources
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.Properties.Resources.resources
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csproj.GenerateResource.Cache
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csproj.CoreCompileInputs.cache
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.exe
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.pdb
+E:\visual studio 2017\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.pdb
+E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csprojResolveAssemblyReference.cache

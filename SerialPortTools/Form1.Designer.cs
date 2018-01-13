@@ -32,7 +32,6 @@
             this.RbnHex = new System.Windows.Forms.RadioButton();
             this.RbnChar = new System.Windows.Forms.RadioButton();
             this.BtnOpenCOM = new System.Windows.Forms.Button();
-            this.BtnCheckCOM = new System.Windows.Forms.Button();
             this.CbxDataBits = new System.Windows.Forms.ComboBox();
             this.CbxParity = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -59,7 +58,6 @@
             this.SettingsBox.Controls.Add(this.RbnHex);
             this.SettingsBox.Controls.Add(this.RbnChar);
             this.SettingsBox.Controls.Add(this.BtnOpenCOM);
-            this.SettingsBox.Controls.Add(this.BtnCheckCOM);
             this.SettingsBox.Controls.Add(this.CbxDataBits);
             this.SettingsBox.Controls.Add(this.CbxParity);
             this.SettingsBox.Controls.Add(this.label5);
@@ -109,16 +107,6 @@
             this.BtnOpenCOM.UseVisualStyleBackColor = true;
             this.BtnOpenCOM.Click += new System.EventHandler(this.BtnOpenCOM_Click);
             // 
-            // BtnCheckCOM
-            // 
-            this.BtnCheckCOM.Location = new System.Drawing.Point(453, 26);
-            this.BtnCheckCOM.Name = "BtnCheckCOM";
-            this.BtnCheckCOM.Size = new System.Drawing.Size(75, 23);
-            this.BtnCheckCOM.TabIndex = 10;
-            this.BtnCheckCOM.Text = "串口检测";
-            this.BtnCheckCOM.UseVisualStyleBackColor = true;
-            this.BtnCheckCOM.Click += new System.EventHandler(this.BtnCheckCOM_Click);
-            // 
             // CbxDataBits
             // 
             this.CbxDataBits.FormattingEnabled = true;
@@ -131,7 +119,6 @@
             this.CbxDataBits.Name = "CbxDataBits";
             this.CbxDataBits.Size = new System.Drawing.Size(121, 20);
             this.CbxDataBits.TabIndex = 9;
-
             // 
             // CbxParity
             // 
@@ -361,7 +348,6 @@
         private System.Windows.Forms.RadioButton RbnHex;
         private System.Windows.Forms.RadioButton RbnChar;
         private System.Windows.Forms.Button BtnOpenCOM;
-        private System.Windows.Forms.Button BtnCheckCOM;
         private System.Windows.Forms.ComboBox CbxDataBits;
         private System.Windows.Forms.ComboBox CbxParity;
         private System.Windows.Forms.Label label5;
