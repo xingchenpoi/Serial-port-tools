@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
+//using System.Diagnostics;
 
 namespace SerialPortTools
 {
@@ -146,8 +147,20 @@ namespace SerialPortTools
                 sp.StopBits = StopBits.One;
             }
 
-            sp.DataBits = Convert.ToInt32(CbxBaudBate.Text.Trim());
 
+           
+            try
+            {
+                int temp = Convert.ToInt16(CbxDataBits.Text.Trim());
+                sp.DataBits = temp;
+                //System.Diagnostics.Debug.WriteLine("数据位设置正确");
+            }
+            catch
+            {
+                MessageBox.Show("数据位设置错误","错误信息");
+            }
+           
+           
     
 
             string s = CbxParity.Text.Trim();//设置奇偶校验
