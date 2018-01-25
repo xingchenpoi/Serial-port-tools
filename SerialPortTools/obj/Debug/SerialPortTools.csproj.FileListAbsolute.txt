@@ -16,3 +16,12 @@ E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.pdb
 E:\visual studio 2017\SerialPortTools\SerialPortTools\bin\Debug\SerialPortTools.pdb
 E:\visual studio 2017\SerialPortTools\SerialPortTools\obj\Debug\SerialPortTools.csprojResolveAssemblyReference.cache
+D:\工作\代码\Serial-port-tools\SerialPortTools\bin\Debug\SerialPortTools.exe
+D:\工作\代码\Serial-port-tools\SerialPortTools\bin\Debug\SerialPortTools.pdb
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.csprojResolveAssemblyReference.cache
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.Form1.resources
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.Properties.Resources.resources
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.csproj.GenerateResource.Cache
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.csproj.CoreCompileInputs.cache
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.exe
+D:\工作\代码\Serial-port-tools\SerialPortTools\obj\Debug\SerialPortTools.pdb

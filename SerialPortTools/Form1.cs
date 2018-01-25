@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace SerialPortTools
 {
@@ -189,9 +190,8 @@ namespace SerialPortTools
                     {
                         try
                         {
-                            //TbxRecvData.Text += sp.ReadExisting();
                             builder.Append(Encoding.ASCII.GetString(buff));  //直接按ASCII规则转换成字符串  
-                            System.Diagnostics.Debug.WriteLine("接收数据");
+                            System.Diagnostics.Debug.WriteLine("接收ASCII数据");
 
                         }
                         catch (Exception)
@@ -203,14 +203,11 @@ namespace SerialPortTools
                     {
                         try
                         {
-                            Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
-                            sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
-                            string RecvDataText = null;
-                            for (int i = 0; i < ReceivedData.Length; i++)
+                            foreach (byte b in buff)
                             {
-                                RecvDataText += (ReceivedData[i].ToString("X2") + "");
+                                builder.Append(b.ToString("X2")+ " ");
                             }
-                            TbxRecvData.Text += RecvDataText;
+                            System.Diagnostics.Debug.WriteLine("接收16进制数据");
                         }
                         catch (Exception)
                         {
@@ -219,7 +216,7 @@ namespace SerialPortTools
                         }
                     }
                     //追加的形式添加到文本框末端，并滚动到最后。
-
+                    this.TbxRecvData.AppendText(builder.ToString());
 
                     sp.DiscardInBuffer(); //丢弃接收缓冲区数据
                     System.Diagnostics.Debug.WriteLine("接收数据");
@@ -245,13 +242,24 @@ namespace SerialPortTools
                     }
                     else
                     {
-                        Byte[] SendData = new Byte[TbxSendData.Text.Length];
-                        string s = TbxSendData.Text;
-                        for (int i = 0; i < TbxSendData.Text.Length; i++)
+                        //Byte[] SendData = new Byte[TbxSendData.Text.Length];
+                        //string s = TbxSendData.Text;
+                        //for (int i = 0; i < TbxSendData.Text.Length; i++)
+                        //{
+                        //    SendData[i] = Convert.ToByte(s[i]);
+                        //}
+                        //sp.Write(SendData,0,TbxSendData.Text.Length);
+                        // 只用正则得到有效的十六进制数  
+                        MatchCollection mc = Regex.Matches(TbxSendData.Text, @"(?i)[/da-f]{2}");
+                        List<byte> buff = new List<byte>();// 填充到这个临时列表中 
+                        //依次添加到列表中
+                        foreach (Match m in mc)
                         {
-                            SendData[i] = Convert.ToByte(s[i]);
+                            buff.Add(byte.Parse(m.Value));
                         }
-                        sp.Write(SendData,0,TbxSendData.Text.Length);
+                        // 转换列表为数组后发送 
+                        sp.Write(buff.ToArray(),0,buff.Count);
+                        System.Diagnostics.Debug.WriteLine("发送16进制数据");
                     }
                 }
                 catch (Exception)
