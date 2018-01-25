@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
-//using System.Diagnostics;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SerialPortTools
 {
     public partial class Form1 : Form
     {
-        SerialPort sp = null; //声明一个串口类
+        SerialPort sp = new SerialPort(); //声明一个串口类
         bool IsOped = false;  //打开串口标志位
         bool IsSetProperty = false; //属性设置标志位
         bool IsHEX = false;  //十六进制显示标志位
-       
+        private StringBuilder builder = new StringBuilder(); //避免在事件处理方法中反复的创建，定义到外面。
+        private long received_count = 0;  //接收计数
+        private long send_count = 0;//发送计数
+
 
         public Form1()
         {
             InitializeComponent();
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -37,6 +34,7 @@ namespace SerialPortTools
             CbxDataBits.SelectedIndex = 0;
             CbxParity.SelectedIndex = 0;
 
+            sp.NewLine = "\r\n";
 
             bool COMExistence = false; //有可用的串口标志
             CbxCOMPort.Items.Clear();  //清除当前串口号中的说有串口名称
@@ -92,12 +90,8 @@ namespace SerialPortTools
 
         private void SetPortProperty() //设置串口属性
         {
-            sp = new SerialPort
-            {
-                PortName = CbxCOMPort.Text.Trim(),
-
-                BaudRate = Convert.ToInt32(CbxBaudBate.Text.Trim())
-            };
+            sp.PortName = CbxCOMPort.Text.Trim();
+            sp.BaudRate = Convert.ToInt32(CbxBaudBate.Text.Trim());
 
             float f = Convert.ToSingle(CbxStopBits.Text.Trim());
 
@@ -158,12 +152,12 @@ namespace SerialPortTools
             sp.RtsEnable = true;
 
             try
-            {               
+            {
                 sp.DataReceived += new SerialDataReceivedEventHandler(Sp_DataReceived);
             }
             catch (Exception)
             {
-                MessageBox.Show("接收进程错误","错误提示");
+                MessageBox.Show("创建接收进程错误","错误提示");
             }
 
             if (RbnHex.Checked)
@@ -180,45 +174,62 @@ namespace SerialPortTools
         //接收进程
         private void Sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            try
-            {
-                if (IsHEX == false)
+            int TextNum = sp.BytesToRead;  //获取接收的字节数
+            byte[] buff = new byte[TextNum];   //声明一个临时数组来存储当前的串口数据
+            received_count += TextNum;         //记录接收的字节数
+            sp.Read(buff, 0, TextNum);       //获取串口数据
+            builder.Clear();         //清除字符串构造器的内容
+
+
+            //一定要加上INVOKE,不然会出现莫名奇妙的问题   因为要访问ui资源，所以需要invoke同步UI  
+            this.Invoke((EventHandler)(delegate {
+                try
                 {
-                    try
+                    if (IsHEX == false)
                     {
-                        TbxRecvData.Text += sp.ReadLine();
-                    }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("ASCII接收错误","错误提示");
-                    }                   
-                }
-                else
-                {
-                    try
-                    {
-                        Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
-                        sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
-                        string RecvDataText = null;
-                        for (int i = 0; i < ReceivedData.Length; i++)
+                        try
                         {
-                            RecvDataText +=( ReceivedData[i].ToString("X2") + "");
+                            //TbxRecvData.Text += sp.ReadExisting();
+                            builder.Append(Encoding.ASCII.GetString(buff));  //直接按ASCII规则转换成字符串  
+                            System.Diagnostics.Debug.WriteLine("接收数据");
+
                         }
-                        TbxRecvData.Text += RecvDataText;
+                        catch (Exception)
+                        {
+                            MessageBox.Show("ASCII接收错误", "错误提示");
+                        }
                     }
-                    catch (Exception)
+                    else
                     {
-                        MessageBox.Show("16进制数接收错误", "错误提示");
-                        TbxRecvData.Text = "";
+                        try
+                        {
+                            Byte[] ReceivedData = new Byte[sp.BytesToRead];//创建接收字节数组
+                            sp.Read(ReceivedData, 0, ReceivedData.Length);//读取所接收到的数据
+                            string RecvDataText = null;
+                            for (int i = 0; i < ReceivedData.Length; i++)
+                            {
+                                RecvDataText += (ReceivedData[i].ToString("X2") + "");
+                            }
+                            TbxRecvData.Text += RecvDataText;
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("16进制数接收错误", "错误提示");
+                            TbxRecvData.Text = "";
+                        }
                     }
+                    //追加的形式添加到文本框末端，并滚动到最后。
+
+
+                    sp.DiscardInBuffer(); //丢弃接收缓冲区数据
+                    System.Diagnostics.Debug.WriteLine("接收数据");
                 }
-                sp.DiscardInBuffer(); //丢弃接收缓冲区数据
-                System.Diagnostics.Debug.WriteLine("接收数据");
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("接收线程错误","错误提示");
-            }
+                catch (Exception)
+                {
+                    MessageBox.Show("接收线程错误", "错误提示");
+                }
+            }));
+            
         }
 
         //发送数据按钮
@@ -316,10 +327,11 @@ namespace SerialPortTools
 
         }
 
+        //清空按钮
         private void BtnCleanData_Click(object sender, EventArgs e)
         {
-            TbxRecvData.Text = "";
-            TbxSendData.Text = "";
+            TbxRecvData.Clear();
+            TbxSendData.Clear();
         }
 
 
