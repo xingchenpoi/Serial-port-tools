@@ -12,7 +12,6 @@ namespace SerialPortTools
         SerialPort sp = new SerialPort(); //声明一个串口类
         bool IsOped = false;  //打开串口标志位
         bool IsSetProperty = false; //属性设置标志位
-        bool IsHEX = false;  //十六进制显示标志位
         private StringBuilder builder = new StringBuilder(); //避免在事件处理方法中反复的创建，定义到外面。
         private long received_count = 0;  //接收计数
         private long send_count = 0;//发送计数
@@ -150,7 +149,7 @@ namespace SerialPortTools
 
             sp.ReadTimeout = -1;  //设置超时读取时间
 
-            sp.RtsEnable = true;
+            //sp.RtsEnable = true;
 
             try
             {
@@ -159,15 +158,6 @@ namespace SerialPortTools
             catch (Exception)
             {
                 MessageBox.Show("创建接收进程错误","错误提示");
-            }
-
-            if (RbnHex.Checked)
-            {
-                IsHEX = true;
-            }
-            else
-            {
-                IsHEX = false;
             }
 
         }
@@ -186,20 +176,7 @@ namespace SerialPortTools
             this.Invoke((EventHandler)(delegate {
                 try
                 {
-                    if (IsHEX == false)
-                    {
-                        try
-                        {
-                            builder.Append(Encoding.ASCII.GetString(buff));  //直接按ASCII规则转换成字符串  
-                            System.Diagnostics.Debug.WriteLine("接收ASCII数据");
-
-                        }
-                        catch (Exception)
-                        {
-                            MessageBox.Show("ASCII接收错误", "错误提示");
-                        }
-                    }
-                    else
+                    if (RbnHex.Checked)                   
                     {
                         try
                         {
@@ -215,6 +192,19 @@ namespace SerialPortTools
                             TbxRecvData.Text = "";
                         }
                     }
+                    else
+                    {
+                        try
+                        {
+                            builder.Append(Encoding.ASCII.GetString(buff));  //直接按ASCII规则转换成字符串  
+                            System.Diagnostics.Debug.WriteLine("接收ASCII数据");
+
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("ASCII接收错误", "错误提示");
+                        }
+                    }
                     //追加的形式添加到文本框末端，并滚动到最后。
                     this.TbxRecvData.AppendText(builder.ToString());
 
@@ -226,7 +216,23 @@ namespace SerialPortTools
                     MessageBox.Show("接收线程错误", "错误提示");
                 }
             }));
-            
+
+        }
+
+        /// <summary>
+        /// 字符串转16进制字节数组
+        /// </summary>
+        /// <param name="hexString"></param>
+        /// <returns></returns>
+        private static byte[] StrToToHexByte(string hexString)
+        {
+            hexString = hexString.Replace(" ", "");
+            if ((hexString.Length % 2) != 0)
+                hexString += " ";
+            byte[] returnBytes = new byte[hexString.Length / 2];
+            for (int i = 0; i < returnBytes.Length; i++)
+                returnBytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+            return returnBytes;
         }
 
         //发送数据按钮
@@ -236,30 +242,28 @@ namespace SerialPortTools
             {
                 try
                 {
-                    if (IsHEX == false)
+                    if (RbnHex.Checked)
                     {
-                        sp.WriteLine(TbxSendData.Text);
+                        //// 只用正则得到有效的十六进制数  
+                        //MatchCollection mc = Regex.Matches(TbxSendData.Text, @"(?i)[/da-f]{2}");
+                        //List<byte> buff = new List<byte>();// 填充到这个临时列表中 
+                        ////依次添加到列表中
+                        //foreach (Match m in mc)
+                        //{
+                        //    buff.Add(byte.Parse(m.Value));
+                        //}
+                        //// 转换列表为数组后发送 
+                        //sp.Write(buff.ToArray(), 0, buff.Count);
+
+                        byte[] buff = new byte[TbxSendData.Text.Length/2];
+                        buff = StrToToHexByte(TbxSendData.Text);
+                        sp.Write(buff,0,buff.Length);
+                        //sp.WriteLine(buff.ToString());
+                        System.Diagnostics.Debug.WriteLine("发送16进制数据");
                     }
                     else
                     {
-                        //Byte[] SendData = new Byte[TbxSendData.Text.Length];
-                        //string s = TbxSendData.Text;
-                        //for (int i = 0; i < TbxSendData.Text.Length; i++)
-                        //{
-                        //    SendData[i] = Convert.ToByte(s[i]);
-                        //}
-                        //sp.Write(SendData,0,TbxSendData.Text.Length);
-                        // 只用正则得到有效的十六进制数  
-                        MatchCollection mc = Regex.Matches(TbxSendData.Text, @"(?i)[/da-f]{2}");
-                        List<byte> buff = new List<byte>();// 填充到这个临时列表中 
-                        //依次添加到列表中
-                        foreach (Match m in mc)
-                        {
-                            buff.Add(byte.Parse(m.Value));
-                        }
-                        // 转换列表为数组后发送 
-                        sp.Write(buff.ToArray(),0,buff.Count);
-                        System.Diagnostics.Debug.WriteLine("发送16进制数据");
+                        sp.WriteLine(TbxSendData.Text);
                     }
                 }
                 catch (Exception)
