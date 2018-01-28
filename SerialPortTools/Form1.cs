@@ -61,6 +61,8 @@ namespace SerialPortTools
             {
                 MessageBox.Show("我没有找到可使用串口！", "错误提示");
             }
+
+           
         }
 
 
@@ -277,6 +279,10 @@ namespace SerialPortTools
             }
         }
 
+
+        
+
+
         //打开串口按钮
         private void BtnOpenCOM_Click(object sender, EventArgs e)
         {
@@ -346,7 +352,45 @@ namespace SerialPortTools
             TbxSendData.Clear();
         }
 
+        //定时器事件
+        private void SendRegular_Timer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                //SendRegular_Timer.Interval = Convert.ToInt32(MSlabel.Text) * 1000;
+                SendRegular_Timer.Interval = int.Parse(MSlabel.Text) * 1000; ;
+                if (CB_TimeSend.Checked)
+                {
+                    BtnSend.PerformClick();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("定时器发送失败", "错误提示");
+            }
+        }
 
+        //勾上定时器发送
+        private void CB_TimeSend_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (CB_TimeSend.Checked)
+                {
+                    SendRegular_Timer.Tick += new EventHandler(SendRegular_Timer_Tick);
+                    SendRegular_Timer.Enabled = true;  //打开定时器
+                }
+                else
+                {
+                    SendRegular_Timer.Enabled = false; //关闭定时器
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("打开定时器失败","错误提示");
+            }
+
+        }
     }
 
 

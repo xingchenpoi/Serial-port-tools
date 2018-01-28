@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.SettingsBox = new System.Windows.Forms.GroupBox();
             this.RbnHex = new System.Windows.Forms.RadioButton();
             this.RbnChar = new System.Windows.Forms.RadioButton();
@@ -45,9 +46,13 @@
             this.RevDATABox = new System.Windows.Forms.GroupBox();
             this.TbxRecvData = new System.Windows.Forms.TextBox();
             this.SendDataBox = new System.Windows.Forms.GroupBox();
+            this.MSlabel = new System.Windows.Forms.Label();
+            this.TB_SentTime = new System.Windows.Forms.TextBox();
+            this.CB_TimeSend = new System.Windows.Forms.CheckBox();
             this.BtnSend = new System.Windows.Forms.Button();
             this.BtnCleanData = new System.Windows.Forms.Button();
             this.TbxSendData = new System.Windows.Forms.TextBox();
+            this.SendRegular_Timer = new System.Windows.Forms.Timer(this.components);
             this.SettingsBox.SuspendLayout();
             this.RevDATABox.SuspendLayout();
             this.SendDataBox.SuspendLayout();
@@ -70,7 +75,7 @@
             this.SettingsBox.Controls.Add(this.label1);
             this.SettingsBox.Location = new System.Drawing.Point(13, 13);
             this.SettingsBox.Name = "SettingsBox";
-            this.SettingsBox.Size = new System.Drawing.Size(577, 136);
+            this.SettingsBox.Size = new System.Drawing.Size(674, 136);
             this.SettingsBox.TabIndex = 0;
             this.SettingsBox.TabStop = false;
             this.SettingsBox.Text = "参数设置";
@@ -263,7 +268,7 @@
             this.RevDATABox.Controls.Add(this.TbxRecvData);
             this.RevDATABox.Location = new System.Drawing.Point(13, 177);
             this.RevDATABox.Name = "RevDATABox";
-            this.RevDATABox.Size = new System.Drawing.Size(577, 199);
+            this.RevDATABox.Size = new System.Drawing.Size(674, 199);
             this.RevDATABox.TabIndex = 1;
             this.RevDATABox.TabStop = false;
             this.RevDATABox.Text = "数据接收";
@@ -275,24 +280,54 @@
             this.TbxRecvData.Multiline = true;
             this.TbxRecvData.Name = "TbxRecvData";
             this.TbxRecvData.ReadOnly = true;
-            this.TbxRecvData.Size = new System.Drawing.Size(562, 172);
+            this.TbxRecvData.Size = new System.Drawing.Size(665, 172);
             this.TbxRecvData.TabIndex = 0;
             // 
             // SendDataBox
             // 
+            this.SendDataBox.Controls.Add(this.MSlabel);
+            this.SendDataBox.Controls.Add(this.TB_SentTime);
+            this.SendDataBox.Controls.Add(this.CB_TimeSend);
             this.SendDataBox.Controls.Add(this.BtnSend);
             this.SendDataBox.Controls.Add(this.BtnCleanData);
             this.SendDataBox.Controls.Add(this.TbxSendData);
             this.SendDataBox.Location = new System.Drawing.Point(13, 403);
             this.SendDataBox.Name = "SendDataBox";
-            this.SendDataBox.Size = new System.Drawing.Size(577, 105);
+            this.SendDataBox.Size = new System.Drawing.Size(674, 105);
             this.SendDataBox.TabIndex = 2;
             this.SendDataBox.TabStop = false;
             this.SendDataBox.Text = "数据发送";
             // 
+            // MSlabel
+            // 
+            this.MSlabel.AutoSize = true;
+            this.MSlabel.Location = new System.Drawing.Point(589, 54);
+            this.MSlabel.Name = "MSlabel";
+            this.MSlabel.Size = new System.Drawing.Size(17, 12);
+            this.MSlabel.TabIndex = 5;
+            this.MSlabel.Text = "ms";
+            // 
+            // TB_SentTime
+            // 
+            this.TB_SentTime.Location = new System.Drawing.Point(522, 45);
+            this.TB_SentTime.Name = "TB_SentTime";
+            this.TB_SentTime.Size = new System.Drawing.Size(60, 21);
+            this.TB_SentTime.TabIndex = 4;
+            // 
+            // CB_TimeSend
+            // 
+            this.CB_TimeSend.AutoSize = true;
+            this.CB_TimeSend.Location = new System.Drawing.Point(437, 51);
+            this.CB_TimeSend.Name = "CB_TimeSend";
+            this.CB_TimeSend.Size = new System.Drawing.Size(72, 16);
+            this.CB_TimeSend.TabIndex = 3;
+            this.CB_TimeSend.Text = "定时发送";
+            this.CB_TimeSend.UseVisualStyleBackColor = true;
+            this.CB_TimeSend.CheckedChanged += new System.EventHandler(this.CB_TimeSend_CheckedChanged);
+            // 
             // BtnSend
             // 
-            this.BtnSend.Location = new System.Drawing.Point(477, 75);
+            this.BtnSend.Location = new System.Drawing.Point(437, 76);
             this.BtnSend.Name = "BtnSend";
             this.BtnSend.Size = new System.Drawing.Size(75, 23);
             this.BtnSend.TabIndex = 2;
@@ -302,7 +337,7 @@
             // 
             // BtnCleanData
             // 
-            this.BtnCleanData.Location = new System.Drawing.Point(477, 21);
+            this.BtnCleanData.Location = new System.Drawing.Point(437, 21);
             this.BtnCleanData.Name = "BtnCleanData";
             this.BtnCleanData.Size = new System.Drawing.Size(75, 23);
             this.BtnCleanData.TabIndex = 1;
@@ -323,7 +358,7 @@
             this.AcceptButton = this.BtnSend;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 520);
+            this.ClientSize = new System.Drawing.Size(699, 567);
             this.Controls.Add(this.SendDataBox);
             this.Controls.Add(this.RevDATABox);
             this.Controls.Add(this.SettingsBox);
@@ -362,6 +397,10 @@
         private System.Windows.Forms.Button BtnSend;
         private System.Windows.Forms.Button BtnCleanData;
         private System.Windows.Forms.TextBox TbxSendData;
+        private System.Windows.Forms.CheckBox CB_TimeSend;
+        private System.Windows.Forms.Label MSlabel;
+        private System.Windows.Forms.TextBox TB_SentTime;
+        private System.Windows.Forms.Timer SendRegular_Timer;
     }
 }
 
