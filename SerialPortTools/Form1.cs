@@ -14,7 +14,7 @@ namespace SerialPortTools
         bool IsSetProperty = false; //属性设置标志位
         private StringBuilder builder = new StringBuilder(); //避免在事件处理方法中反复的创建，定义到外面。
         private long received_count = 0;  //接收计数
-        private long send_count = 0;//发送计数
+        //private long send_count = 0;//发送计数
 
 
         public Form1()
@@ -244,23 +244,27 @@ namespace SerialPortTools
             {
                 try
                 {
+                    //如果定时发送数据按钮已选上
+                    if (CB_TimeSend.Checked)
+                    {
+                        if (Timer.Enabled == false)
+                        {
+                            Timer.Start();
+                        }
+                            
+                    }
+                    else
+                    {
+                        if (Timer.Enabled == true)
+                        {
+                            Timer.Stop();  //停止定时器
+                        }
+                    }
                     if (RbnHex.Checked)
                     {
-                        //// 只用正则得到有效的十六进制数  
-                        //MatchCollection mc = Regex.Matches(TbxSendData.Text, @"(?i)[/da-f]{2}");
-                        //List<byte> buff = new List<byte>();// 填充到这个临时列表中 
-                        ////依次添加到列表中
-                        //foreach (Match m in mc)
-                        //{
-                        //    buff.Add(byte.Parse(m.Value));
-                        //}
-                        //// 转换列表为数组后发送 
-                        //sp.Write(buff.ToArray(), 0, buff.Count);
-
                         byte[] buff = new byte[TbxSendData.Text.Length/2];
                         buff = StrToToHexByte(TbxSendData.Text);
                         sp.Write(buff,0,buff.Length);
-                        //sp.WriteLine(buff.ToString());
                         System.Diagnostics.Debug.WriteLine("发送16进制数据");
                     }
                     else
@@ -318,6 +322,7 @@ namespace SerialPortTools
                     //打开串口失败后，响应标志为取消
                     IsSetProperty = false;
                     IsOped = false;
+                    Timer.Enabled = false;       //关闭定时器
                     MessageBox.Show("串口无效或已被占用", "错误提示");
                 }
             }
@@ -336,9 +341,11 @@ namespace SerialPortTools
                     CbxStopBits.Enabled = true;
                     RbnChar.Enabled = true;
                     RbnHex.Enabled = true;
+                    Timer.Stop();  //停止定时器
                 }
                 catch (Exception)
                 {
+                    Timer.Stop();  //停止定时器
                     MessageBox.Show("串口无法关闭", "错误提示");
                 }
             }
@@ -353,44 +360,26 @@ namespace SerialPortTools
         }
 
         //定时器事件
-        private void SendRegular_Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
+            string strsecond = TB_SentTime.Text;
             try
             {
-                //SendRegular_Timer.Interval = Convert.ToInt32(MSlabel.Text) * 1000;
-                SendRegular_Timer.Interval = int.Parse(MSlabel.Text) * 1000; ;
-                if (CB_TimeSend.Checked)
+                int isecond = int.Parse(strsecond);
+                Timer.Interval = isecond;
+                if (Timer.Enabled == true)
                 {
                     BtnSend.PerformClick();
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show("定时器发送失败", "错误提示");
-            }
-        }
-
-        //勾上定时器发送
-        private void CB_TimeSend_CheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (CB_TimeSend.Checked)
-                {
-                    SendRegular_Timer.Tick += new EventHandler(SendRegular_Timer_Tick);
-                    SendRegular_Timer.Enabled = true;  //打开定时器
-                }
-                else
-                {
-                    SendRegular_Timer.Enabled = false; //关闭定时器
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("打开定时器失败","错误提示");
+                Timer.Stop();  //停止定时器
+                MessageBox.Show("打开定时器失败", "错误提示");
             }
 
         }
+
     }
 
 

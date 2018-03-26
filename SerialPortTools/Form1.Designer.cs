@@ -52,7 +52,7 @@
             this.BtnSend = new System.Windows.Forms.Button();
             this.BtnCleanData = new System.Windows.Forms.Button();
             this.TbxSendData = new System.Windows.Forms.TextBox();
-            this.SendRegular_Timer = new System.Windows.Forms.Timer(this.components);
+            this.Timer = new System.Windows.Forms.Timer(this.components);
             this.SettingsBox.SuspendLayout();
             this.RevDATABox.SuspendLayout();
             this.SendDataBox.SuspendLayout();
@@ -323,7 +323,6 @@
             this.CB_TimeSend.TabIndex = 3;
             this.CB_TimeSend.Text = "定时发送";
             this.CB_TimeSend.UseVisualStyleBackColor = true;
-            this.CB_TimeSend.CheckedChanged += new System.EventHandler(this.CB_TimeSend_CheckedChanged);
             // 
             // BtnSend
             // 
@@ -352,6 +351,11 @@
             this.TbxSendData.Name = "TbxSendData";
             this.TbxSendData.Size = new System.Drawing.Size(422, 78);
             this.TbxSendData.TabIndex = 0;
+            // 
+            // Timer
+            // 
+            this.Timer.Interval = 1000;
+            this.Timer.Tick += new System.EventHandler(this.Timer_Tick);
             // 
             // Form1
             // 
@@ -400,7 +404,7 @@
         private System.Windows.Forms.CheckBox CB_TimeSend;
         private System.Windows.Forms.Label MSlabel;
         private System.Windows.Forms.TextBox TB_SentTime;
-        private System.Windows.Forms.Timer SendRegular_Timer;
+        private System.Windows.Forms.Timer Timer;
     }
 }
 
